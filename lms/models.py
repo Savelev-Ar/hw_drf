@@ -1,12 +1,12 @@
 from django.db import models
 
+
 class Course(models.Model):
 
     name = models.CharField(
         max_length=150,
         verbose_name='Название'
     )
-
     preview = models.ImageField(
         upload_to='media/lms',
         blank=True,
@@ -23,6 +23,7 @@ class Course(models.Model):
         verbose_name = 'Курс'
         verbose_name_plural = 'Курсы'
         ordering = ['name']
+
 
 class Lesson(models.Model):
 
