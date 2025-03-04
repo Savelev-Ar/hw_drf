@@ -80,3 +80,11 @@ class Payment(models.Model):
         max_length=20,
         choices=METHODS,
         verbose_name='Способ оплаты')
+
+    def __str__(self):
+        return f'{self.paid_course if self.paid_course else self.paid_lesson} - {self.payment_amount}'
+
+    class Meta:
+        verbose_name = 'платеж'
+        verbose_name_plural = 'платежы'
+        ordering = ['payment_date']
