@@ -19,13 +19,13 @@ class CourseSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
 
 
-
     def get_number_of_lessons(self, obj):
         return obj.lessons.count()
 
     def get_is_subscriber(self, obj):
-        if CourseSerializer.current_user:
-            subscribe = Subscribe.objects.all().filter(course=obj).filter(user=CourseSerializer.current_user)
+        user = self.context.get('request').user
+        if user:
+            subscribe = Subscribe.objects.all().filter(course=obj, user=user)
             if subscribe.exists():
                 return 'подписан'
             else:

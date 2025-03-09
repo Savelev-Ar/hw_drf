@@ -13,7 +13,7 @@ lms/migrations/0002_course_owner_lesson_owner.py       6      0   100%
 lms/migrations/__init__.py                             0      0   100%
 lms/models.py                                         25      2    92%
 lms/paginators.py                                      5      0   100%
-lms/serializers.py                                    25      7    72%
+lms/serializers.py                                    26      8    69%
 lms/tests.py                                          37      0   100%
 lms/urls.py                                            8      0   100%
 lms/validators.py                                      9      2    78%
@@ -36,4 +36,4 @@ users/serializers.py                                  14      0   100%
 users/urls.py                                          7      0   100%
 users/views.py                                        46     13    72%
 ----------------------------------------------------------------------
-TOTAL                                                377     56    85%
+TOTAL                                                378     57    85%
