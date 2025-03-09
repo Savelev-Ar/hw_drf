@@ -8,6 +8,8 @@ from users.models import Payment, User, Subscribe, Course
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from users.services import check_payment_status, create_product, create_price, create_session
+
 
 class PaymentListAPIView(generics.ListAPIView):
     serializer_class = PaymentSerializer
@@ -16,6 +18,25 @@ class PaymentListAPIView(generics.ListAPIView):
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend,)
     filterset_fields = ('paid_course', 'paid_lesson', 'payment_method')
     ordering_fields = ('payment_date',)
+
+    def get_queryset(self):
+        """
+        Метод возвращает список платежей для отображения.
+        Получаем список подписок.
+        Проверяем статус оплаты на сервисе Stripe.
+        """
+        subscribes = Subscribe.objects.all()
+        for subscribe in subscribes:
+            if subscribe.payment_id:
+                payment_data = check_payment_status(subscribe.payment_id)
+                if payment_data['payment_status'] == 'paid':  # проверяем статус платежа
+                    # если платежа в базе данных нет, создаем его
+                    if not Payment.objects.all().filter(user=subscribe.user, course=subscribe.course):
+                        Payment.objects.create(user=subscribe.user,
+                                               course=subscribe.course,
+                                               payment_amount=payment_data['amount_total'] / 100,
+                                               payment_method='transfer to account')
+        return Payment.objects.all()
 
 
 class UserCreateAPIView(generics.CreateAPIView):
@@ -64,6 +85,10 @@ class SubscribeView(generics.GenericAPIView):
             message = 'подписка удалена'
         # Если подписки у пользователя на этот курс нет - создаем ее
         else:
+            prod_id = create_product(course_item.name)
+            price_id = create_price(course_item.price, prod_id)
+            payment_url, payment_id = create_session(price_id)
+            # print(payment_url)
             Subscribe.objects.create(user=user, course=course_item)
             message = 'подписка добавлена'
         # Возвращаем ответ в API

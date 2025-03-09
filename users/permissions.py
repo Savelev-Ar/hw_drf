@@ -12,7 +12,7 @@ class IsModerator(BasePermission):
 
 class IsOwner(BasePermission):
     """
-        Проверяет, является ли пользователь создателем курса или урока.
+    Проверяет, является ли пользователь создателем курса или урока.
     """
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user
