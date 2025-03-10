@@ -103,6 +103,12 @@ class Subscribe(models.Model):
         related_name='subscribes',
         verbose_name='Курс')
 
+    payment_id = models.CharField(
+        max_length=300,
+        verbose_name='ID платежа',
+        blank=True,
+        null=True)
+
     def __str__(self):
         return f'{self.user} - {self.course}'
 
