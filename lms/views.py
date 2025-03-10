@@ -1,3 +1,5 @@
+from datetime import timedelta, datetime
+
 from rest_framework import viewsets, generics
 
 from lms.models import Course, Lesson
@@ -5,6 +7,8 @@ from lms.paginators import LMSPaginator
 from lms.serializers import CourseSerializer, LessonSerializer
 from users.permissions import IsModerator, IsOwner
 from rest_framework.permissions import IsAuthenticated
+
+from lms.tasks import send_email
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -16,6 +20,14 @@ class CourseViewSet(viewsets.ModelViewSet):
         course = serializer.save()
         course.owner = self.request.user
         course.save()
+
+    def perform_update(self, serializer, *args, **kwargs):
+        course = serializer.save()
+        if CourseViewSet.dict_last_updates.get(course):
+            last_update = CourseViewSet.dict_last_updates.get(course)
+            if datetime.now() - last_update >= timedelta(hours=4):
+                send_email.delay(course.pk)
+        CourseViewSet.dict_last_updates.update({course: datetime.now()})
 
     def get_permissions(self):
 
